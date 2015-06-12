@@ -1,0 +1,188 @@
+import time, picamera, pygame
+from pygame.locals import *
+from tkinter import *
+
+def take_picture():
+    #opens the camera and takes the picture a a resolutuion of 800 by 600.
+    #saves it as image.jpg
+    global name
+    with picamera.PiCamera() as camera:
+        name = name_()
+        angle = angle_()
+        camera.rotation = angle
+        camera.start_preview()
+        time.sleep(5)
+        camera.resolution = (int(x), int(y))
+        camera.capture('/home/pi/Desktop/' + name + '.jpg')    
+        camera.stop_preview()
+
+def timelaspe():
+    global name
+    with picamera.PiCamera() as camera:
+        name = name_()
+        angle = angle_()
+        time_ = int(input("How long of a pause would you like between images? "))
+        ammount = int(input("How many images would you like to take? "))
+        camera.rotation = angle
+        count = 0
+        for i in range(ammount):
+            camera.start_preview()
+            time.sleep(time_)
+            camera.resolution = (int(x), int(y))
+            camera.capture('/home/pi/Desktop/' + name + str(count) + '.jpg')
+            count += 1
+        camera.stop_preview()
+
+def open_image():
+    #opens a pygame window and pastes the image onto it
+    pygame.display.init
+    background_image = pygame.image.load(name + ".jpg")
+    screen = pygame.display.set_mode((int(x), int(y)))
+    screen.blit(background_image,(0,0))
+    pygame.display.flip()
+
+def close_image():
+    #closes the pygame window
+    pygame.quit()
+
+def display_timelaspe():
+    pygame.display.init
+    loop = True
+    count = 0
+    try:
+        while loop:
+            count += 1
+            background_image = pygame.image.load(name + str(count) + ".jpg")
+            screen = pygame.display.set_mode((int(x), int(y)))
+            screen.blit(background_image,(0,0))
+            pygame.display.flip()
+            time.sleep(0.2)
+    except:
+        pygame.quit()
+
+def image_size_button():
+    global size
+    root = Tk()
+    class Application(Frame):
+        def small_(self):
+            global size
+            size = "400 by 200"
+            root.quit()
+            Frame.destroy(self)
+
+
+        def large_(self):
+            global size
+            size = "1000 by 700"
+            root.quit()
+            Frame.destroy(self)
+
+        def medium_(self):
+            global size        
+            size = "800 by 600"
+            root.quit()
+            Frame.destroy(self)
+
+        def createwidgets(self):
+            #set frame with the button on it
+            self.small = Button(self)
+            self.small["text"] = "Small",
+            self.small["command"] = self.small_
+
+            self.small.pack({"side": "left"})
+
+            self.medium = Button(self)
+            self.medium["text"] = "Medium"
+            self.medium["command"] = self.medium_
+
+            self.medium.pack({"side": "left"})
+
+            self.large = Button(self)
+            self.large["text"] = "large",
+            self.large["command"] = self.large_
+
+            self.large.pack({"side": "left"})
+
+        def __init__(self, master=None):
+            #assembley the frame
+            Frame.__init__(self, master)
+            self.pack()
+            self.createwidgets()
+
+
+    def choose():
+        #figure out wicth button were pressed
+        global size, x, y
+        app = Application(master=root)
+        app.mainloop()
+        if size == "400 by 200":
+            x = 400
+            y = 200
+        elif size == "800 by 600":
+            x = 800
+            y = 600
+        elif size == "1000 by 700":
+            x = 1000
+            y = 700
+    choose()
+    try:
+        self.destroy()
+    except:
+        print("")
+
+def name_():
+    name = input("what would you like to call the image? ")
+    return name
+
+def angle_():
+    loop = True
+    while loop:
+        angle = input("What rotation would you like the picture taken at? ")
+        _angle = int(angle) % 90
+        if _angle == 0:
+            loop = False
+            return angle
+        else:
+            print("Can only accept 0, 90, 180, 270, 360")
+
+def choice():
+    root = Tk()
+    class Application(Frame):
+        def image(self):
+            image_size_button()
+            take_picture()    
+            open_image()
+            time.sleep(5)
+            close_image()
+            root.quit()
+            Frame.destroy(self)
+
+
+        def timelaspe_(self):
+            image_size_button()
+            timelaspe()
+            display_timelaspe()
+            root.quit()
+            Frame.destroy(self)
+            
+        def createwidgets(self):
+            #set frame with the button on it
+            self.image_ = Button(self)
+            self.image_["text"] = "take picture"
+            self.image_["command"] = self.image
+            self.image_.pack({"side": "left"})
+
+            self.timelaspe__ = Button(self)
+            self.timelaspe__["text"] = "take timelaspe"
+            self.timelaspe__["command"] = self.timelaspe_
+            self.timelaspe__.pack({"side": "left"})
+
+        def __init__(self, master=None):
+            #assembley the frame
+            Frame.__init__(self, master)
+            self.pack()
+            self.createwidgets()
+    app = Application(master=root)
+    app.mainloop()
+
+choice()
